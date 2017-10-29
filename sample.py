@@ -6,6 +6,7 @@ import argparse
 import time
 import os
 from six.moves import cPickle
+from tensorflow.python.lib.io import file_io
 
 from utils import TextLoader
 from model import Model
@@ -29,9 +30,9 @@ def main():
     sample(args)
 
 def sample(args):
-    with open(os.path.join(args.save_dir, 'config.pkl'), 'rb') as f:
+    with file_io.FileIO(os.path.join(args.save_dir, 'config.pkl'), 'rb') as f:
         saved_args = cPickle.load(f)
-    with open(os.path.join(args.save_dir, 'words_vocab.pkl'), 'rb') as f:
+    with file_io.FileIO(os.path.join(args.save_dir, 'words_vocab.pkl'), 'rb') as f:
         words, vocab = cPickle.load(f)
     model = Model(saved_args, True)
     with tf.Session() as sess:

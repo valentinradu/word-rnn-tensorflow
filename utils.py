@@ -7,6 +7,8 @@ import numpy as np
 import re
 import itertools
 
+from tensorflow.python.lib.io import file_io
+
 class TextLoader():
     def __init__(self, data_dir, batch_size, seq_length, encoding=None):
         self.data_dir = data_dir
@@ -72,7 +74,7 @@ class TextLoader():
         self.vocab, self.words = self.build_vocab(x_text)
         self.vocab_size = len(self.words)
 
-        with open(vocab_file, 'wb') as f:
+        with file_io.FileIO(vocab_file, 'wb') as f:
             cPickle.dump(self.words, f)
 
         #The same operation like this [self.vocab[word] for word in x_text]
@@ -82,7 +84,7 @@ class TextLoader():
         np.save(tensor_file, self.tensor)
 
     def load_preprocessed(self, vocab_file, tensor_file):
-        with open(vocab_file, 'rb') as f:
+        with file_io.FileIO(vocab_file, 'rb') as f:
             self.words = cPickle.load(f)
         self.vocab_size = len(self.words)
         self.vocab = dict(zip(self.words, range(len(self.words))))

@@ -6,12 +6,15 @@ import argparse
 import time
 import os
 from six.moves import cPickle
+from tensorflow.python.lib.io import file_io
 
 from utils import TextLoader
 from model import Model
 
 def main():
     parser = argparse.ArgumentParser()
+    parser.add_argument('--job-dir', type=str, default='',
+                       help='job directory needed for ml cloud')
     parser.add_argument('--data_dir', type=str, default='data/tinyshakespeare',
                        help='data directory containing input.txt')
     parser.add_argument('--input_encoding', type=str, default=None,
@@ -68,21 +71,21 @@ def train(args):
         assert ckpt.model_checkpoint_path,"No model path found in checkpoint"
 
         # open old config and check if models are compatible
-        with open(os.path.join(args.init_from, 'config.pkl'), 'rb') as f:
+        with file_io.FileIO(os.path.join(args.init_from, 'config.pkl'), 'rb') as f:
             saved_model_args = cPickle.load(f)
         need_be_same=["model","rnn_size","num_layers","seq_length"]
         for checkme in need_be_same:
             assert vars(saved_model_args)[checkme]==vars(args)[checkme],"Command line argument and saved model disagree on '%s' "%checkme
 
         # open saved vocab/dict and check if vocabs/dicts are compatible
-        with open(os.path.join(args.init_from, 'words_vocab.pkl'), 'rb') as f:
+        with file_io.FileIO(os.path.join(args.init_from, 'words_vocab.pkl'), 'rb') as f:
             saved_words, saved_vocab = cPickle.load(f)
         assert saved_words==data_loader.words, "Data and loaded model disagree on word set!"
         assert saved_vocab==data_loader.vocab, "Data and loaded model disagree on dictionary mappings!"
 
-    with open(os.path.join(args.save_dir, 'config.pkl'), 'wb') as f:
+    with file_io.FileIO(os.path.join(args.save_dir, 'config.pkl'), 'wb') as f:
         cPickle.dump(args, f)
-    with open(os.path.join(args.save_dir, 'words_vocab.pkl'), 'wb') as f:
+    with file_io.FileIO(os.path.join(args.save_dir, 'words_vocab.pkl'), 'wb') as f:
         cPickle.dump((data_loader.words, data_loader.vocab), f)
 
     model = Model(args)
