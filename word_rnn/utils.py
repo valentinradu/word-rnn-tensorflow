@@ -75,17 +75,18 @@ class TextLoader():
         self.vocab, self.words = self.build_vocab(x_text)
         self.vocab_size = len(self.words)
 
-        with file_io.FileIO(vocab_file, 'wb') as f:
+        with file_io.FileIO(vocab_file, 'w') as f:
             cPickle.dump(self.words, f)
 
         #The same operation like this [self.vocab[word] for word in x_text]
         # index of words as our basic data
         self.tensor = np.array(list(map(self.vocab.get, x_text)))
         # Save the data to data.npy
-        np.save(tensor_file, self.tensor)
+        with file_io.FileIO(tensor_file, "w") as f:
+            np.save(f, self.tensor)
 
     def load_preprocessed(self, vocab_file, tensor_file):
-        with file_io.FileIO(vocab_file, 'rb') as f:
+        with file_io.FileIO(vocab_file, 'r') as f:
             self.words = cPickle.load(f)
         self.vocab_size = len(self.words)
         self.vocab = dict(zip(self.words, range(len(self.words))))

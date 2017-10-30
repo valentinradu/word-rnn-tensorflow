@@ -71,21 +71,21 @@ def train(args):
         assert ckpt.model_checkpoint_path,"No model path found in checkpoint"
 
         # open old config and check if models are compatible
-        with file_io.FileIO(os.path.join(args.init_from, 'config.pkl'), 'rb') as f:
+        with file_io.FileIO(os.path.join(args.init_from, 'config.pkl'), 'r') as f:
             saved_model_args = cPickle.load(f)
         need_be_same=["model","rnn_size","num_layers","seq_length"]
         for checkme in need_be_same:
             assert vars(saved_model_args)[checkme]==vars(args)[checkme],"Command line argument and saved model disagree on '%s' "%checkme
 
         # open saved vocab/dict and check if vocabs/dicts are compatible
-        with file_io.FileIO(os.path.join(args.init_from, 'words_vocab.pkl'), 'rb') as f:
+        with file_io.FileIO(os.path.join(args.init_from, 'words_vocab.pkl'), 'r') as f:
             saved_words, saved_vocab = cPickle.load(f)
         assert saved_words==data_loader.words, "Data and loaded model disagree on word set!"
         assert saved_vocab==data_loader.vocab, "Data and loaded model disagree on dictionary mappings!"
 
-    with file_io.FileIO(os.path.join(args.save_dir, 'config.pkl'), 'wb') as f:
+    with file_io.FileIO(os.path.join(args.save_dir, 'config.pkl'), 'w') as f:
         cPickle.dump(args, f)
-    with file_io.FileIO(os.path.join(args.save_dir, 'words_vocab.pkl'), 'wb') as f:
+    with file_io.FileIO(os.path.join(args.save_dir, 'words_vocab.pkl'), 'w') as f:
         cPickle.dump((data_loader.words, data_loader.vocab), f)
 
     model = Model(args)
