@@ -1,6 +1,6 @@
 import unittest
 
-from utils import TextLoader
+from word_rnn.utils import TextLoader
 
 
 class TestStringMethods(unittest.TestCase):

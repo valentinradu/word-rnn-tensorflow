@@ -1,11 +1,11 @@
 import unittest
-from utils import TextLoader
+from word_rnn.utils import TextLoader
 import numpy as np
 from collections import Counter
 
 class TestUtilsMethods(unittest.TestCase):
     def setUp(self):
-        self.data_loader = TextLoader("tests/test_data", batch_size=2, seq_length=5)
+        self.data_loader = TextLoader("test/test_data", batch_size=2, seq_length=5)
 
     def test_init(self):
       print (self.data_loader.vocab)

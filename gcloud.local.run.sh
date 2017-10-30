@@ -1,5 +1,5 @@
 gcloud ml-engine local train \
-    --module-name word-rnn.train \
-    --package-path ./word-rnn \
+    --module-name word_rnn.train \
+    --package-path ./word_rnn \
     -- \
     --data_dir ./data/rnn-c-data
