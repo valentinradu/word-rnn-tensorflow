@@ -14,8 +14,11 @@ gcloud ml-engine jobs submit training $JOB_NAME\
     --data_dir gs://$BUCKET_NAME/ \
     --log_dir gs://$BUCKET_NAME/logs/ \
     --save_dir gs://$BUCKET_NAME/save/ \
-    --init_from gs://$BUCKET_NAME/save/ \
-    --num_epochs 15
+    --batch_size 5 \
+    --seq_length 100 \
+    --save_every 5000 \
+    --learning_rate 0.008 \
+    --num_epochs 10
     
 
 # gcloud ml-engine jobs submit training $JOB_NAME \
