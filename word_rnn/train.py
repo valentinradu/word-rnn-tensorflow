@@ -8,8 +8,8 @@ import os
 from six.moves import cPickle
 from tensorflow.python.lib.io import file_io
 
-from utils import TextLoader
-from model import Model
+from word_rnn.utils import TextLoader
+from word_rnn.model import Model
 
 def main():
     parser = argparse.ArgumentParser()
@@ -43,7 +43,7 @@ def main():
                        help='learning rate')
     parser.add_argument('--decay_rate', type=float, default=0.97,
                        help='decay rate for rmsprop')
-    parser.add_argument('--gpu_mem', type=float, default=0.666,
+    parser.add_argument('--gpu_mem', type=float, default=0.9,
                        help='%% of gpu memory to be allocated to this process. Default is 66.6%%')
     parser.add_argument('--init_from', type=str, default=None,
                        help="""continue training from saved model at this path. Path must contain files saved by previous training process:
@@ -63,9 +63,6 @@ def train(args):
     # check compatibility if training is continued from previously saved model
     if args.init_from is not None:
         # check if all necessary files exist
-        assert os.path.isdir(args.init_from)," %s must be a path" % args.init_from
-        assert os.path.isfile(os.path.join(args.init_from,"config.pkl")),"config.pkl file does not exist in path %s"%args.init_from
-        assert os.path.isfile(os.path.join(args.init_from,"words_vocab.pkl")),"words_vocab.pkl.pkl file does not exist in path %s" % args.init_from
         ckpt = tf.train.get_checkpoint_state(args.init_from)
         assert ckpt,"No checkpoint found"
         assert ckpt.model_checkpoint_path,"No model path found in checkpoint"
