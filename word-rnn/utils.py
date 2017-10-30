@@ -64,7 +64,8 @@ class TextLoader():
         return [vocabulary, vocabulary_inv]
 
     def preprocess(self, input_file, vocab_file, tensor_file, encoding):
-        with codecs.open(input_file, "r", encoding=encoding) as f:
+        
+        with file_io.FileIO(input_file, "r") as f:
             data = f.read()
 
         # Optional text cleaning or make them lower case, etc.
