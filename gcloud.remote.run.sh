@@ -11,7 +11,9 @@ gcloud ml-engine jobs submit training $JOB_NAME\
     --region $REGION \
     --config cloudml-gpu.yaml \
     -- \
-    --data_dir gs://$BUCKET_NAME/
+    --data_dir gs://$BUCKET_NAME \
+    --log_dir gs://$BUCKET_NAME/logs
+    --save_dir gs://$BUCKET_NAME/save
 
 # gcloud ml-engine jobs submit training $JOB_NAME \
 #     --job-dir gs://$BUCKET_NAME/$JOB_NAME \
