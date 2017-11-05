@@ -92,7 +92,6 @@ def train(args):
     gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=args.gpu_mem)
 
     with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
-        tf.train.write_graph(sess.graph_def, args.save_dir, "graph.pb", False)
         train_writer.add_graph(sess.graph)
         tf.global_variables_initializer().run()
         saver = tf.train.Saver(tf.global_variables())

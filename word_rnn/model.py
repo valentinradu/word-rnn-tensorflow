@@ -29,9 +29,10 @@ class Model():
 
         self.cell = cell = rnn.MultiRNNCell(cells, state_is_tuple=False)
 
-        self.input_data = tf.placeholder(tf.int32, [args.batch_size, args.seq_length])
-        self.targets = tf.placeholder(tf.int32, [args.batch_size, args.seq_length])
+        self.input_data = tf.placeholder(tf.int32, [args.batch_size, args.seq_length], name='data_in')
+        self.targets = tf.placeholder(tf.int32, [args.batch_size, args.seq_length], name='targets')
         self.initial_state = cell.zero_state(args.batch_size, tf.float32)
+        self.initial_state = tf.identity(self.initial_state, name='state_in')
         self.batch_pointer = tf.Variable(0, name="batch_pointer", trainable=False, dtype=tf.int32)
         self.inc_batch_pointer_op = tf.assign(self.batch_pointer, self.batch_pointer + 1)
         self.epoch_pointer = tf.Variable(0, name="epoch_pointer", trainable=False)
@@ -68,7 +69,8 @@ class Model():
         outputs, last_state = legacy_seq2seq.rnn_decoder(inputs, self.initial_state, cell, loop_function=loop if infer else None, scope='rnnlm')
         output = tf.reshape(tf.concat(outputs, 1), [-1, args.rnn_size])
         self.logits = tf.matmul(output, softmax_w) + softmax_b
-        self.probs = tf.nn.softmax(self.logits)
+        self.probs = tf.nn.softmax(self.logits, name='data_out')
+        last_state = tf.identity(last_state, name='state_out')
         loss = legacy_seq2seq.sequence_loss_by_example([self.logits],
                 [tf.reshape(self.targets, [-1])],
                 [tf.ones([args.batch_size * args.seq_length])],
@@ -115,10 +117,6 @@ class Model():
             return samples[np.argmin(scores)]
 
         ret = ''
-        print(self.input_data)
-        print(self.initial_state)
-        print(self.probs)
-        print(self.final_state)
         if pick == 1:
             state = sess.run(self.cell.zero_state(1, tf.float32))
             if not len(prime) or prime == ' ':

@@ -25,9 +25,18 @@ def main():
                        help='width of the beam search')
     parser.add_argument('--sample', type=int, default=1,
                        help='0 to use max at each timestep, 1 to sample at each timestep, 2 to sample on spaces')
+    parser.add_argument('--freeze_graph', dest='freeze_graph', action='store_true',
+                       help='if true, freeze (replace variables with consts), prune (for inference) and save graph')
 
     args = parser.parse_args()
     sample(args)
+
+def freeze_and_save_graph(sess, folder, out_nodes, as_text=False):
+    ## save graph definition
+    graph_raw = sess.graph_def
+    graph_frz = tf.graph_util.convert_variables_to_constants(sess, graph_raw, out_nodes)
+    ext = '.txt' if as_text else '.pb'
+    tf.train.write_graph(graph_frz, folder, 'graph_frz'+ext, as_text=as_text)
 
 def sample(args):
     with file_io.FileIO(os.path.join(args.save_dir, 'config.pkl'), 'rb') as f:
@@ -41,6 +50,8 @@ def sample(args):
         ckpt = tf.train.get_checkpoint_state(args.save_dir)
         if ckpt and ckpt.model_checkpoint_path:
             saver.restore(sess, ckpt.model_checkpoint_path)
+            if(args.freeze_graph):
+                freeze_and_save_graph(sess, args.save_dir, ['data_out', 'state_out'], False)
             print(model.sample(sess, words, vocab, args.n, args.prime, args.sample, args.pick, args.width))
 
 if __name__ == '__main__':
