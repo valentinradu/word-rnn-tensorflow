@@ -21,7 +21,7 @@ def main():
                        help='character encoding of input.txt, from https://docs.python.org/3/library/codecs.html#standard-encodings')
     parser.add_argument('--log_dir', type=str, default='logs',
                        help='directory containing tensorboard logs')
-    parser.add_argument('--save_dir', type=str, default='save',
+    parser.add_argument('--save_dir', type=str, default='save/last',
                        help='directory to store checkpointed models')
     parser.add_argument('--rnn_size', type=int, default=256,
                        help='size of RNN hidden state')
@@ -92,6 +92,7 @@ def train(args):
     gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=args.gpu_mem)
 
     with tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)) as sess:
+        tf.train.write_graph(sess.graph_def, args.save_dir, "graph.pb", False)
         train_writer.add_graph(sess.graph)
         tf.global_variables_initializer().run()
         saver = tf.train.Saver(tf.global_variables())
@@ -129,6 +130,7 @@ def train(args):
                     saver.save(sess, checkpoint_path, global_step = e * data_loader.num_batches + b)
                     print("model saved to {}".format(checkpoint_path))
         train_writer.close()
+
 
 if __name__ == '__main__':
     main()

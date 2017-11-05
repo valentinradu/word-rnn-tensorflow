@@ -24,10 +24,10 @@ class Model():
 
         cells = []
         for _ in range(args.num_layers):
-            cell = cell_fn(args.rnn_size)
+            cell = cell_fn(args.rnn_size, state_is_tuple=False)
             cells.append(cell)
 
-        self.cell = cell = rnn.MultiRNNCell(cells)
+        self.cell = cell = rnn.MultiRNNCell(cells, state_is_tuple=False)
 
         self.input_data = tf.placeholder(tf.int32, [args.batch_size, args.seq_length])
         self.targets = tf.placeholder(tf.int32, [args.batch_size, args.seq_length])
@@ -83,6 +83,7 @@ class Model():
         optimizer = tf.train.AdamOptimizer(self.lr)
         self.train_op = optimizer.apply_gradients(zip(grads, tvars))
 
+
     def sample(self, sess, words, vocab, num=200, prime='first all', sampling_type=1, pick=0, width=4):
         def weighted_pick(weights):
             t = np.cumsum(weights)
@@ -114,6 +115,10 @@ class Model():
             return samples[np.argmin(scores)]
 
         ret = ''
+        print(self.input_data)
+        print(self.initial_state)
+        print(self.probs)
+        print(self.final_state)
         if pick == 1:
             state = sess.run(self.cell.zero_state(1, tf.float32))
             if not len(prime) or prime == ' ':
