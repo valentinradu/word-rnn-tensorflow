@@ -37,6 +37,7 @@ def freeze_and_save_graph(sess, folder, out_nodes, as_text=False):
     graph_frz = tf.graph_util.convert_variables_to_constants(sess, graph_raw, out_nodes)
     ext = '.txt' if as_text else '.pb'
     tf.train.write_graph(graph_frz, folder, 'graph_frz'+ext, as_text=as_text)
+    tf.train.write_graph(graph_raw, folder, 'graph_raw'+ext, as_text=as_text)
 
 def sample(args):
     with file_io.FileIO(os.path.join(args.save_dir, 'config.pkl'), 'rb') as f:
